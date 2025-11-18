@@ -1,6 +1,4 @@
-import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { authService } from '../api/authService';
 
 
 export default function MenuScreen({ navigation }) {

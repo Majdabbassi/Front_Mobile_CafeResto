@@ -1,6 +1,6 @@
 // screens/LoginScreen.js
-import React, { useState } from 'react';
 
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  ActivityIndicator, // ✅ Ajouté ici
+  ActivityIndicator,
 } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
@@ -26,7 +26,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       const data = await authService.login(username, password);
       Alert.alert('Succès', 'Connexion réussie !');
-      // navigation.replace('Menu', { user: data });
+      navigation.replace('Menu', { user: data });
     } catch (err) {
       Alert.alert('Erreur', err.message || 'Une erreur est survenue');
     } finally {
