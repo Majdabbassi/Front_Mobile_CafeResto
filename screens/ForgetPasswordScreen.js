@@ -1,4 +1,5 @@
 // screens/ForgetPasswordScreen.js
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { authService } from '../api/authService';
 import {
@@ -34,7 +35,12 @@ const ForgetPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mot de passe oublié</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#3A2A23" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Mot de passe oublié</Text>
+      </View>
 
       <TextInput
         style={styles.input}
@@ -67,11 +73,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     marginBottom: 30,
-    textAlign: 'center',
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    padding: 10,
   },
   input: {
     borderWidth: 1,

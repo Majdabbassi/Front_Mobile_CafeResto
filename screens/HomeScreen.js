@@ -4,6 +4,7 @@ import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
+console.log('Screen width:', width);
 
 const HomeScreen = ({ navigation }) => {
   const route = useRoute();
@@ -71,7 +72,7 @@ const HomeScreen = ({ navigation }) => {
   // Toggle Sidebar
   const toggleSidebar = () => {
     console.log('toggleSidebar called. Current sidebarOpen:', sidebarOpen);
-    const toValue = sidebarOpen ? -width * 0.75 : 0;
+    const toValue = sidebarOpen ? -width : 0;
     const fadeValue = sidebarOpen ? 0 : 1;
     console.log('toValue:', toValue, 'fadeValue:', fadeValue);
 
@@ -228,7 +229,7 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.menuText}>Menu</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Likes'); }}>
             <Ionicons name="heart-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mes Favoris</Text>
             {favorites.length > 0 && (
@@ -238,12 +239,12 @@ const HomeScreen = ({ navigation }) => {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('History'); }}>
             <Ionicons name="gift-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mes Récompenses</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Settings'); }}>
             <Ionicons name="time-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Historique</Text>
           </TouchableOpacity>
@@ -274,6 +275,9 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <View style={styles.topBarRight}>
+            <TouchableOpacity onPress={() => navigation.navigate('QRScanner')} style={{ marginRight: 15 }}>
+              <Ionicons name="qr-code-outline" size={28} color="#3A2A23" />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.notificationButton}>
               <Animated.View style={{ transform: [{ scale: unseenOffers > 0 ? notificationPulse : 1 }] }}>
                 <Ionicons name="notifications" size={24} color="#3A2A23" />

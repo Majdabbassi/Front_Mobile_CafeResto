@@ -10,6 +10,11 @@ import SigninScreen from './screens/SigninScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import MenuScreen from './screens/MenuScreen';
 import HomeScreen from './screens/HomeScreen';
+import LikesScreen from './screens/LikesScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import HistoryScreen from './screens/HistoryScreen';
+import QRScannerScreen from './screens/QRScannerScreen';
 
 // Écran d'accueil (Splash-like)
 function InitialWelcomeScreen({ navigation }) {
@@ -76,8 +81,13 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signin" component={SigninScreen} />
         <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
+        <Stack.Screen name="QRScanner" component={QRScannerScreen} />
         <Stack.Screen name="Menu" component={MenuScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Likes" component={LikesScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
