@@ -9,9 +9,10 @@ import LoginScreen from './screens/LoginScreen';
 import SigninScreen from './screens/SigninScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import MenuScreen from './screens/MenuScreen';
+import HomeScreen from './screens/HomeScreen';
 
 // Écran d'accueil (Splash-like)
-function WelcomeScreen({ navigation }) {
+function InitialWelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Overlay gradient */}
@@ -70,12 +71,13 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      <Stack.Navigator initialRouteName="InitialWelcome" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="InitialWelcome" component={InitialWelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signin" component={SigninScreen} />
         <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
         <Stack.Screen name="Menu" component={MenuScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

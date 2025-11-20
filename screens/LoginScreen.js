@@ -27,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       const data = await authService.login(login, password);
       Alert.alert('Succès', 'Connexion réussie !');
-      navigation.replace('Menu', { user: data });
+      navigation.replace('Home', { user: data });
     } catch (err) {
       console.log("LOGIN ERROR:", err);
       Alert.alert('Erreur', err.message || "Identifiants incorrects");

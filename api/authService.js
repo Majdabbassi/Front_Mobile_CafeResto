@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // services/authService.js
 
-const API_URL = "http://localhost:8080/api/auth";
+const API_URL = "http://192.168.1.134:8080/api/auth";
 
 const authService = {
   login: async (login, password) => {

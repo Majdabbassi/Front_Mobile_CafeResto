@@ -65,6 +65,9 @@ export default function MenuScreen({ navigation }) {
     <View style={styles.container}>
       {/* Top Bar */}
       <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={30} color="#5A3E2B" />
+        </TouchableOpacity>
         <Text style={styles.title}>Menu</Text>
         <TouchableOpacity>
           <Ionicons name="person-circle-outline" size={34} color="#5A3E2B" />

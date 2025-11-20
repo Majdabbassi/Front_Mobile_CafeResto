@@ -39,7 +39,7 @@ const SigninScreen = ({ navigation }) => {
       await authService.register(clientData);
       console.log('Registration successful');
       Alert.alert('Succès', 'Inscription réussie ! Vous pouvez vous connecter.');
-      navigation.navigate('Login');
+      navigation.navigate('Home');
     } catch (err) {
       console.error('Registration error:', err);
       Alert.alert('Erreur', err.message);
