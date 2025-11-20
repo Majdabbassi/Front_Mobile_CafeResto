@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { authService } from '../api/authService';
+import authService from '../api/authService';
 
 const SigninScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -21,21 +21,27 @@ const SigninScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
+    console.log('handleSignup function called');
     if (!email || !username || !password || !confirmPassword) {
+      console.log('Validation: Missing fields');
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
     }
     if (password !== confirmPassword) {
+      console.log('Validation: Passwords do not match');
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
       return;
     }
     setLoading(true);
     try {
       const clientData = { email, username, password };
+      console.log('Attempting to register with clientData:', clientData);
       await authService.register(clientData);
+      console.log('Registration successful');
       Alert.alert('Succès', 'Inscription réussie ! Vous pouvez vous connecter.');
       navigation.navigate('Login');
     } catch (err) {
+      console.error('Registration error:', err);
       Alert.alert('Erreur', err.message);
     } finally {
       setLoading(false);

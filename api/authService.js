@@ -35,6 +35,29 @@ const authService = {
     }
 
     return data;
+  },
+
+  register: async (clientData) => {
+    const res = await fetch(`${API_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(clientData),
+    });
+
+    let data;
+    try {
+      data = await res.json();
+      console.log('Register API Response Data:', data);
+      console.log('Register API Response Status:', res.status);
+      console.log('Register API Response OK:', res.ok);
+    } catch (e) {
+      throw new Error("Erreur serveur");
+    }
+
+    if (!res.ok) {
+      throw new Error(data.error || "Erreur d'inscription");
+    }
+    return data;
   }
 };
 
