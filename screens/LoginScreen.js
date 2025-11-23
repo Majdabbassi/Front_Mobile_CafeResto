@@ -24,6 +24,7 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
     setLoading(true);
+    console.log("Attempting login with:", { login, password });
     try {
       const data = await authService.login(login, password);
       Alert.alert('Succès', 'Connexion réussie !');
