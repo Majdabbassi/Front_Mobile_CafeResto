@@ -1,4 +1,5 @@
 // screens/SigninScreen.js
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -11,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { authService } from '../api/authService';
+import authService from '../api/authService';
 
 const SigninScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -21,21 +22,27 @@ const SigninScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
+    console.log('handleSignup function called');
     if (!email || !username || !password || !confirmPassword) {
+      console.log('Validation: Missing fields');
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
     }
     if (password !== confirmPassword) {
+      console.log('Validation: Passwords do not match');
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
       return;
     }
     setLoading(true);
     try {
       const clientData = { email, username, password };
+      console.log('Attempting to register with clientData:', clientData);
       await authService.register(clientData);
+      console.log('Registration successful');
       Alert.alert('Succès', 'Inscription réussie ! Vous pouvez vous connecter.');
-      navigation.navigate('Login');
+      navigation.navigate('Home');
     } catch (err) {
+      console.error('Registration error:', err);
       Alert.alert('Erreur', err.message);
     } finally {
       setLoading(false);
@@ -55,8 +62,10 @@ const SigninScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* Logo/Icône Café */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.coffeeIcon}>☕</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#FFF" />
+          </TouchableOpacity>
           <Text style={styles.brandName}>Mon Café</Text>
         </View>
 
@@ -163,13 +172,18 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
-  logoContainer: {
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    position: 'relative',
     marginBottom: 32,
   },
-  coffeeIcon: {
-    fontSize: 56,
-    marginBottom: 8,
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    padding: 10,
   },
   brandName: {
     fontSize: 28,
@@ -178,6 +192,8 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
+    textAlign: 'center',
+    flex: 1,
   },
   formCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',

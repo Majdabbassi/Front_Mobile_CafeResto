@@ -1,4 +1,5 @@
 // screens/LoginScreen.js
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   View,
@@ -28,7 +29,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       const data = await authService.login(login, password);
       Alert.alert('Succès', 'Connexion réussie !');
-      navigation.replace('Menu', { user: data });
+      navigation.replace('Home', { user: data });
     } catch (err) {
       console.log("LOGIN ERROR:", err);
       Alert.alert('Erreur', err.message || "Identifiants incorrects");
@@ -47,8 +48,10 @@ const LoginScreen = ({ navigation }) => {
       
       <View style={styles.content}>
         {/* Logo/Icône Café */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.coffeeIcon}>☕</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#FFF" />
+          </TouchableOpacity>
           <Text style={styles.brandName}>Mon Café</Text>
         </View>
 
@@ -135,13 +138,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
-  logoContainer: {
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    position: 'relative',
     marginBottom: 40,
   },
-  coffeeIcon: {
-    fontSize: 64,
-    marginBottom: 8,
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    padding: 10,
   },
   brandName: {
     fontSize: 32,
@@ -150,6 +158,8 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
+    textAlign: 'center',
+    flex: 1,
   },
   formCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
