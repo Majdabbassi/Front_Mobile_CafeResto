@@ -25,18 +25,32 @@ export default function LikesScreen({ navigation }) {
 
   const renderLikedProduct = ({ item }) => (
     <View style={styles.productCard}>
-      {item.image && <Image source={{ uri: item.image }} style={styles.productImage} />}
+      <View style={styles.imageContainer}>
+        {item.image && <Image source={{ uri: item.image }} style={styles.productImage} />}
+        <View style={styles.imageBadge}>
+          <Ionicons name="heart" size={16} color="#FF6B6B" />
+        </View>
+      </View>
       <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        {item.offer && <Text style={styles.productOffer}>{item.offer}</Text>}
-        {item.desc && <Text style={styles.productDescription}>{item.desc}</Text>}
+        <Text style={styles.productName} numberOfLines={1}>{item.name}</Text>
+        {item.offer && (
+          <View style={styles.offerBadge}>
+            <Ionicons name="pricetag" size={12} color="#FF6B6B" />
+            <Text style={styles.productOffer}>{item.offer}</Text>
+          </View>
+        )}
+        {item.desc && <Text style={styles.productDescription} numberOfLines={2}>{item.desc}</Text>}
         <View style={styles.productMeta}>
-          <Ionicons name="location-outline" size={14} color="#8B6F47" />
-          <Text style={styles.productDistance}>{item.distance}</Text>
+          <View style={styles.distanceTag}>
+            <Ionicons name="location-outline" size={14} color="#8B6F47" />
+            <Text style={styles.productDistance}>{item.distance}</Text>
+          </View>
         </View>
       </View>
       <TouchableOpacity onPress={() => toggleFavorite(item.id)} style={styles.removeButton}>
-        <Ionicons name="close-circle" size={24} color="#FF6B6B" />
+        <View style={styles.removeButtonInner}>
+          <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -45,22 +59,46 @@ export default function LikesScreen({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#3A2A23" />
+          <View style={styles.backButtonInner}>
+            <Ionicons name="arrow-back" size={24} color="#3A2A23" />
+          </View>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mes Favoris</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Mes Favoris</Text>
+          {currentLikedProducts.length > 0 && (
+            <View style={styles.countBadge}>
+              <Text style={styles.countText}>{currentLikedProducts.length}</Text>
+            </View>
+          )}
+        </View>
       </View>
+      
       {currentLikedProducts.length > 0 ? (
         <FlatList
           data={currentLikedProducts}
           renderItem={renderLikedProduct}
           keyExtractor={(item, index) => `${item.id}-${index}`}
           contentContainerStyle={styles.productList}
+          showsVerticalScrollIndicator={false}
         />
       ) : (
         <View style={styles.content}>
-          <Ionicons name="heart-outline" size={80} color="#B8A08D" />
-          <Text style={styles.message}>Vous n'avez pas encore de favoris.</Text>
-          <Text style={styles.subMessage}>Ajoutez des cafés à vos favoris pour les retrouver ici !</Text>
+          <View style={styles.emptyIconContainer}>
+            <Ionicons name="heart-outline" size={80} color="#D4C4B0" />
+            <View style={styles.emptyIconBg} />
+          </View>
+          <Text style={styles.message}>Aucun favori pour le moment</Text>
+          <Text style={styles.subMessage}>
+            Explorez nos cafés et ajoutez vos préférés ici en appuyant sur 
+            <Ionicons name="heart" size={14} color="#FF6B6B" />
+          </Text>
+          <TouchableOpacity 
+            style={styles.exploreButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.exploreButtonText}>Explorer les cafés</Text>
+            <Ionicons name="arrow-forward" size={18} color="#FFF" />
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -76,90 +114,211 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    backgroundColor: '#F9F5F0',
   },
   backButton: {
     marginRight: 15,
   },
+  backButtonInner: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  headerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     color: '#3A2A23',
+    letterSpacing: -0.5,
+  },
+  countBadge: {
+    backgroundColor: '#8B6F47',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginLeft: 12,
+  },
+  countText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 30,
+  },
+  emptyIconContainer: {
+    position: 'relative',
+    marginBottom: 25,
+  },
+  emptyIconBg: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#FFF',
+    opacity: 0.6,
+    top: -30,
+    left: -30,
+    zIndex: -1,
   },
   message: {
-    fontSize: 18,
-    color: '#5A3E2B',
-    marginTop: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    color: '#3A2A23',
+    marginTop: 10,
+    fontWeight: '700',
     textAlign: 'center',
+    letterSpacing: -0.3,
   },
   subMessage: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#8B6F47',
-    marginTop: 10,
+    marginTop: 12,
     textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 20,
+  },
+  exploreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8B6F47',
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 25,
+    marginTop: 30,
+    shadowColor: '#8B6F47',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    gap: 8,
+  },
+  exploreButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   productList: {
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   productCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 15,
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 18,
+    marginBottom: 14,
+    shadowColor: '#3A2A23',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#F0EBE3',
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  productImage: {
+    width: 90,
+    height: 90,
     borderRadius: 14,
-    marginBottom: 10,
+    backgroundColor: '#F0EBE3',
+  },
+  imageBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },
   productInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 14,
+    paddingRight: 8,
   },
   productName: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#3A2A23',
+    marginBottom: 6,
+    letterSpacing: -0.2,
+  },
+  offerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFE8E8',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+    gap: 4,
   },
   productOffer: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#FF6B6B',
-    marginTop: 2,
+    fontWeight: '600',
   },
   productDescription: {
-    fontSize: 14,
-    color: '#5A3E2B',
-    marginTop: 2,
+    fontSize: 13,
+    color: '#8B6F47',
+    lineHeight: 18,
+    marginBottom: 8,
   },
   productMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5,
-    gap: 5,
+  },
+  distanceTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9F5F0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
   },
   productDistance: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#8B6F47',
+    fontWeight: '600',
   },
   removeButton: {
-    marginLeft: 10,
-    padding: 5,
+    marginLeft: 8,
   },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 15,
+  removeButtonInner: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFE8E8',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

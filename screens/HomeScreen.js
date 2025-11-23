@@ -22,14 +22,36 @@ const HomeScreen = ({ navigation }) => {
   const cardAnimations = useRef([...Array(8)].map(() => new Animated.Value(0))).current;
   const notificationPulse = useRef(new Animated.Value(1)).current;
 
-  const lastVisited = "Café Latte Caramel";
+  const lastVisitedRestaurant = "Le Gourmet Café";
+
+  const topFood = [
+    { id: 1, name: "Croissant", description: "Pâtisserie française classique", price: "2.50€", imageUrl: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwildwildwhisk.com%2Fhow-to-make-croissant%2F&psig=AOvVaw0sx9F_KlZQrXULhNPkXx-Y&ust=1764006709944000&source=images&opi=89978449' },
+    { id: 2, name: "Muffin Myrtille", description: "Muffin moelleux aux myrtilles", price: "3.00€", imageUrl: 'https://odelices.ouest-france.fr/images/recettes/2013/muffins_aux_myrtilles.jpgs' },
+    { id: 3, name: "Sandwich Poulet", description: "Sandwich frais au poulet grillé", price: "6.50€", imageUrl: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.atelierdeschefs.fr%2Frecettes%2F30696%2Fsandwich-a-la-volaille-roquette-et-pomme-facon-hot-dog%2F&psig=AOvVaw1-8IC6_V80VbLqeuanFtBE&ust=1764006752909000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLD6rf3diJEDFQAAAAAdAAAAABAE' },
+  ];
   const dailyOffers = [
-    { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km" },
-    { id: 2, name: "Espresso House", offer: "1 Espresso acheté = 1 offert", visits: 94, distance: "1.2 km" },
-    { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km" },
-    { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km" },
+    { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 2, name: "Espresso House", offer: "1 Espresso acheté = 1 offert", visits: 94, distance: "1.2 km", imageUrl: 'https://images.unsplash.com/photo-1525610553908-0ff7c7d4421d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1517256064527-0fe794017e4a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
   ];
 
+  const renderFoodItem = ({ item }) => (
+    <View style={styles.foodCard}>
+      <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
+      <View style={styles.foodInfo}>
+        <Text style={styles.foodName}>{item.name}</Text>
+        <Text style={styles.foodDescription}>{item.description}</Text>
+        <Text style={styles.foodPrice}>{item.price}</Text>
+      </View>
+    </View>
+  );
+const topRestaurants = [
+  { id: 1, name: "Le Gourmet", cuisine: "Cuisine française", rating: 4.9, price: "€€€", distance: "1.2 km", specialty: "Spécialité: Bœuf Bourguignon" },
+  { id: 2, name: "Bella Italia", cuisine: "Cuisine italienne", rating: 4.7, price: "€€", distance: "0.8 km", specialty: "Spécialité: Pizza Napolitaine" },
+  { id: 3, name: "Sushi Zen", cuisine: "Cuisine japonaise", rating: 4.8, price: "€€€", distance: "1.5 km", specialty: "Spécialité: Sashimi Premium" },
+  { id: 4, name: "Le Tajine d'Or", cuisine: "Cuisine marocaine", rating: 4.6, price: "€€", distance: "2.0 km", specialty: "Spécialité: Couscous Royal" },
+];
   const recommendedCafes = [
     { id: 1, name: "Café Mocha", desc: "Un mélange doux et chocolaté", distance: "1.5 km" },
     { id: 2, name: "Espresso Royal", desc: "Un café fort pour bien démarrer", distance: "0.9 km" },
@@ -70,7 +92,78 @@ const HomeScreen = ({ navigation }) => {
       ])
     ).start();
   }, []);
+{/* TOP RESTAURANTS */}
+<CardWithAnimation index={5}>
+  <View style={styles.sectionContainer}>
+    <View style={styles.sectionHeader}>
+      <View style={styles.sectionTitleRow}>
+        <Ionicons name="restaurant" size={24} color="#8B6F47" />
+        <Text style={styles.sectionTitle}>Top Restaurants</Text>
+      </View>
+      <Text style={styles.sectionSubtitle}>Les mieux notés près de vous</Text>
+    </View>
 
+    <View style={styles.restaurantsContainer}>
+      {topRestaurants.map((restaurant) => (
+        <TouchableOpacity
+          key={restaurant.id}
+          style={styles.restaurantCard}
+          onPress={() => navigation.navigate("RestaurantDetails", { restaurant })}
+          activeOpacity={0.8}
+        >
+          <View style={styles.restaurantHeader}>
+            <View style={styles.restaurantIconCircle}>
+              <Ionicons name="restaurant" size={24} color="#8B6F47" />
+            </View>
+            
+            <View style={styles.restaurantMainInfo}>
+              <Text style={styles.restaurantName}>{restaurant.name}</Text>
+              <Text style={styles.restaurantCuisine}>{restaurant.cuisine}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.heartButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                toggleFavorite(`restaurant-${restaurant.id}`);
+              }}
+            >
+              <Ionicons 
+                name={favorites.includes(`restaurant-${restaurant.id}`) ? "heart" : "heart-outline"} 
+                size={24} 
+                color={favorites.includes(`restaurant-${restaurant.id}`) ? "#FF6B6B" : "#8B6F47"} 
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.restaurantSpecialty}>{restaurant.specialty}</Text>
+
+          <View style={styles.restaurantFooter}>
+            <View style={styles.restaurantMetaItem}>
+              <Ionicons name="star" size={16} color="#FFD700" />
+              <Text style={styles.restaurantMetaText}>{restaurant.rating}</Text>
+            </View>
+
+            <View style={styles.restaurantMetaItem}>
+              <Ionicons name="cash-outline" size={16} color="#8B6F47" />
+              <Text style={styles.restaurantMetaText}>{restaurant.price}</Text>
+            </View>
+
+            <View style={styles.restaurantMetaItem}>
+              <Ionicons name="location-outline" size={16} color="#8B6F47" />
+              <Text style={styles.restaurantMetaText}>{restaurant.distance}</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.reserveButton}>
+            <Text style={styles.reserveButtonText}>Réserver une table</Text>
+            <Ionicons name="arrow-forward" size={16} color="#FFF" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </View>
+</CardWithAnimation>
   // Toggle Sidebar
   const toggleSidebar = () => {
     console.log('toggleSidebar called. Current sidebarOpen:', sidebarOpen);
@@ -396,7 +489,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.lastVisitedTitle}>Dernier café visité</Text>
-              <Text style={styles.lastVisitedName}>{lastVisited}</Text>
+              <Text style={styles.lastVisitedName}>{lastVisitedRestaurant}</Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#8B6F47" />
           </TouchableOpacity>
@@ -517,6 +610,35 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </CardWithAnimation>
 
+                {/* TOP FOODS */}
+        <View style={styles.sectionContainer}>
+          <View style={styles.sectionTitleRow}>
+            <Text style={styles.sectionTitle}>Top Foods</Text>
+            <TouchableOpacity>
+              <Text style={styles.sectionSubtitle}>Voir tout</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={topFood}
+            renderItem={renderFoodItem}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.carouselContainer}
+          />
+        </View>
+
+        {/* DERNIER RESTAURANT VISITÉ */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Dernier restaurant visité</Text>
+          <View style={styles.lastVisitedRestaurantCard}>
+            <Text style={styles.lastVisitedRestaurantText}>{lastVisitedRestaurant}</Text>
+            <TouchableOpacity style={styles.lastVisitedRestaurantButton}>
+              <Text style={styles.lastVisitedRestaurantButtonText}>Commander à nouveau</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={{ height: 30 }} />
       </ScrollView>
     </View>
@@ -528,7 +650,95 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAF5EF',
   },
-
+// TOP RESTAURANTS
+restaurantsContainer: {
+  paddingHorizontal: 20,
+},
+restaurantCard: {
+  backgroundColor: '#FFF',
+  borderRadius: 16,
+  padding: 18,
+  marginBottom: 15,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 3,
+},
+restaurantHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+  gap: 12,
+},
+restaurantIconCircle: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: '#FFF5E6',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+restaurantMainInfo: {
+  flex: 1,
+},
+restaurantName: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#3A2A23',
+  marginBottom: 3,
+},
+restaurantCuisine: {
+  fontSize: 13,
+  color: '#8B6F47',
+},
+restaurantSpecialty: {
+  fontSize: 14,
+  color: '#6B4F33',
+  fontStyle: 'italic',
+  marginBottom: 12,
+  paddingLeft: 5,
+},
+restaurantFooter: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 15,
+  paddingHorizontal: 5,
+},
+restaurantMetaItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 4,
+},
+restaurantMetaText: {
+  fontSize: 13,
+  color: '#8B6F47',
+  fontWeight: '600',
+},
+reserveButton: {
+  backgroundColor: '#8B6F47',
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 8,
+  shadowColor: '#8B6F47',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 3,
+},
+reserveButtonText: {
+  color: '#FFF',
+  fontSize: 15,
+  fontWeight: 'bold',
+},
+heartButton: {
+  padding: 5,
+},
   // SIDEBAR
   sidebar: {
     position: 'absolute',
@@ -1082,6 +1292,72 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     flex: 1,
   },
+  foodCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    marginRight: 15,
+    width: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  foodImage: {
+    width: '100%',
+    height: 120,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  foodInfo: {
+    padding: 10,
+  },
+  foodName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#3A2A23',
+    marginBottom: 5,
+  },
+  foodDescription: {
+    fontSize: 12,
+    color: '#8B6F47',
+    marginBottom: 5,
+  },
+  foodPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#3A2A23',
+  },
+  lastVisitedRestaurantCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 15,
+    marginHorizontal: 20,
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  lastVisitedRestaurantText: {
+    fontSize: 16,
+    color: '#3A2A23',
+    fontWeight: 'bold',
+  },
+  lastVisitedRestaurantButton: {
+    backgroundColor: '#8B6F47',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  lastVisitedRestaurantButtonText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
 });
-
 export default HomeScreen;
