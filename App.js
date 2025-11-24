@@ -10,12 +10,14 @@ import SigninScreen from './screens/SigninScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import QRScannerScreen from './screens/QRScannerScreen';
 import MenuScreen from './screens/MenuScreen';
+import EffectuerReservationScreen from './screens/EffectuerReservationScreen';
 import HomeScreen from './screens/HomeScreen';
 import LikesScreen from './screens/LikesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import OfferDetailsScreen from './screens/OfferDetailsScreen';
+import CafeListScreen from './screens/CafeListScreen';
 
 // Écran d'accueil (Splash-like)
 function InitialWelcomeScreen({ navigation }) {
@@ -83,13 +85,15 @@ export default function App() {
         <Stack.Screen name="Signin" component={SigninScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Menu" component={MenuScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="MenuScreen" component={MenuScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EffectuerReservationScreen" component={EffectuerReservationScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Likes" component={LikesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

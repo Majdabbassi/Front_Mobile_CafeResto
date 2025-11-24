@@ -399,6 +399,11 @@ const topRestaurants = [
             <Text style={styles.menuText}>Historique</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('CafeList'); }}>
+            <Ionicons name="cafe-outline" size={24} color="#3A2A23" />
+            <Text style={styles.menuText}>Liste des Cafés</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Settings'); }}>
             <Ionicons name="settings-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Paramètres</Text>
