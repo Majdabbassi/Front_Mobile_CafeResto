@@ -19,7 +19,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.profileCard}>
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: user.avatar || 'https://via.placeholder.com/100/8B6F47/FFFFFF?text=U' }}
+            source={{ uri: user.avatar || 'https://scontent.ftun8-1.fna.fbcdn.net/v/t39.30808-6/494515795_2835687209954279_9000285933114725111_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=-muXhjHAceYQ7kNvwEREu-8&_nc_oc=AdlkJePIEkLZBhhgrozPK_aX-feBW_-hiOKhZ62MkfMrZBKl6CrF9xR4cY_y1BxKuCI&_nc_zt=23&_nc_ht=scontent.ftun8-1.fna&_nc_gid=em9u154ILEKB7NuNAlHERw&oh=00_Afi5G79Z_g5R4l0CxJoLtKNFZ6bbAh34AiLHQrObGHSpjg&oe=6928E9C8' }}
             style={styles.avatar}
           />
           <TouchableOpacity style={styles.editAvatarButton}>
@@ -102,6 +102,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginRight: 15,
+    zIndex: 10,
+    backgroundColor: '#8B6F47', // Temporary for debugging
   },
   headerTitle: {
     fontSize: 24,

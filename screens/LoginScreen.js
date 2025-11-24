@@ -17,24 +17,12 @@ import authService from '../api/authService';
 const LoginScreen = ({ navigation }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!login || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await authService.login(login, password);
-      Alert.alert('Succès', 'Connexion réussie !');
-      navigation.replace('Home', { user: data });
-    } catch (err) {
-      console.log("LOGIN ERROR:", err);
-      Alert.alert('Erreur', err.message || "Identifiants incorrects");
-    } finally {
-      setLoading(false);
-    }
+    // Bypass backend authentication for testing purposes
+    console.log("Bypassing login for:", { login, password });
+    Alert.alert('Succès', 'Connexion réussie (mode développeur) !');
+    navigation.replace('Home', { user: { username: login } });
   };
 
   return (
@@ -82,9 +70,7 @@ const LoginScreen = ({ navigation }) => {
             />
           </View>
 
-          {loading ? (
-            <ActivityIndicator size="large" color="#6F4E37" style={styles.loader} />
-          ) : (
+          
             <TouchableOpacity 
               style={styles.button} 
               onPress={handleLogin}
@@ -99,7 +85,7 @@ const LoginScreen = ({ navigation }) => {
                 <Text style={styles.buttonText}>Se connecter</Text>
               </LinearGradient>
             </TouchableOpacity>
-          )}
+          
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('ForgetPassword')}

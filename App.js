@@ -1,6 +1,6 @@
 // App.js
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -8,13 +8,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LoginScreen from './screens/LoginScreen';
 import SigninScreen from './screens/SigninScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
+import QRScannerScreen from './screens/QRScannerScreen';
 import MenuScreen from './screens/MenuScreen';
 import HomeScreen from './screens/HomeScreen';
 import LikesScreen from './screens/LikesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
-import QRScannerScreen from './screens/QRScannerScreen';
+import OfferDetailsScreen from './screens/OfferDetailsScreen';
+import CafeListScreen from './screens/CafeListScreen';
 
 // Écran d'accueil (Splash-like)
 function InitialWelcomeScreen({ navigation }) {
@@ -71,23 +73,25 @@ function InitialWelcomeScreen({ navigation }) {
   );
 }
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="InitialWelcome" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="InitialWelcome" component={InitialWelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Signin" component={SigninScreen} />
-        <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
-        <Stack.Screen name="QRScanner" component={QRScannerScreen} />
-        <Stack.Screen name="Menu" component={MenuScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Likes" component={LikesScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
+      <Stack.Navigator initialRouteName="InitialWelcome">
+        <Stack.Screen name="InitialWelcome" component={InitialWelcomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Signin" component={SigninScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="QRScanner" component={QRScannerScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Menu" component={MenuScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Likes" component={LikesScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
