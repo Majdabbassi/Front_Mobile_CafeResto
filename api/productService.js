@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://localhost:8080/api/products';
+const API_URL = 'http://192.168.1.134/api/products';
 
 const getAllProducts = async () => {
   try {
