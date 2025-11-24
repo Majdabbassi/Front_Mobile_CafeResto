@@ -6,7 +6,7 @@ export default function MenuWebScreen({ route }) {
   const caferestoId = route?.params?.caferestoId || 1;
 
   useEffect(() => {
-    fetch(`http://192.168.1.77:8080/api/products/caferesto/${caferestoId}/visible`) // ton backend local
+    fetch(`http://192.168.88.1:8080/api/products/caferesto/${caferestoId}/visible`) // ton backend local
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error(err));
