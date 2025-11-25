@@ -18,6 +18,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import OfferDetailsScreen from './screens/OfferDetailsScreen';
 import CafeListScreen from './screens/CafeListScreen';
+import ServeurScreen from './screens/ServeurScreen';
 
 // Écran d'accueil (Splash-like)
 function InitialWelcomeScreen({ navigation }) {
@@ -94,6 +95,7 @@ export default function App() {
         <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Serveur" component={ServeurScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

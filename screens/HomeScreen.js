@@ -765,7 +765,6 @@ const topRestaurants = [
             activeOpacity={0.9}
           >
             <Ionicons name="restaurant" size={24} color="#FFF" />
-            <Text style={styles.mainButtonText}>Découvrir le Menu Complet</Text>
             <Ionicons name="arrow-forward" size={24} color="#FFF" />
           </TouchableOpacity>
         </CardWithAnimation>

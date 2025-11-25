@@ -86,6 +86,16 @@ const LoginScreen = ({ navigation }) => {
               </LinearGradient>
             </TouchableOpacity>
           
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => navigation.navigate('Serveur')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="people-circle-outline" size={20} color="#8B6F47" />
+            <Text style={styles.secondaryButtonText}>Espace Serveur</Text>
+            <Ionicons name="arrow-forward" size={16} color="#8B6F47" />
+          </TouchableOpacity>
+          
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('ForgetPassword')}
@@ -212,6 +222,23 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
     letterSpacing: 0.5,
+  },
+  secondaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#8B6F47',
+    paddingVertical: 14,
+    marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+  },
+  secondaryButtonText: {
+    color: '#8B6F47',
+    fontSize: 16,
+    fontWeight: '700',
   },
   linkButton: {
     alignItems: 'center',
