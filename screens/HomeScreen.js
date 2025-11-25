@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import SearchInput from '../components/SearchInput';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, ScrollView, TextInput, FlatList, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, ScrollView, TextInput, FlatList, Image, ImageBackground, Modal } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -15,19 +15,60 @@ const HomeScreen = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [unseenOffers, setUnseenOffers] = useState(2);
   const [isNotificationModalVisible, setNotificationModalVisible] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   
   // Animations
   const slideAnim = useRef(new Animated.Value(-width * 0.75)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const cardAnimations = useRef([...Array(8)].map(() => new Animated.Value(0))).current;
+  const cardAnimations = useRef([...Array(9)].map(() => new Animated.Value(0))).current;
   const notificationPulse = useRef(new Animated.Value(1)).current;
+  const heroViewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 80 }).current;
+  const onHeroViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems && viewableItems.length > 0 && typeof viewableItems[0].index === 'number') {
+      setActiveSlide(viewableItems[0].index);
+    }
+  }).current;
 
-  const lastVisitedRestaurant = "Le Gourmet Café";
+  const displayName = user?.username?.trim?.() ? user.username : "Client Café";
+  const lastVisitedCafe = {
+    name: "Café Arabica",
+    detail: "Cappuccino + croissant doré",
+    time: "Aujourd'hui • 09:20",
+  };
+  const lastVisitedRestaurant = {
+    name: "Le Gourmet Café",
+    detail: "Réservation confirmée pour 2",
+    time: "Hier • 20:00",
+  };
+
+  const heroSlides = [
+    {
+      id: 'slide-1',
+      title: 'Moments café',
+      subtitle: 'Découvrez les nouveautés de la semaine',
+      imageUrl: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=1200',
+      cta: 'Explorer',
+    },
+    {
+      id: 'slide-2',
+      title: 'Brunch & Bakery',
+      subtitle: 'Viennoiseries croustillantes dès 8h',
+      imageUrl: 'https://images.unsplash.com/photo-1458640904116-093b74971de9?w=1200',
+      cta: 'Brunch',
+    },
+    {
+      id: 'slide-3',
+      title: 'Cocktails glacés',
+      subtitle: 'Parfaits pour vos après-midis ensoleillés',
+      imageUrl: 'https://images.unsplash.com/photo-1497534446932-c925b458314e?w=1200',
+      cta: 'Commander',
+    },
+  ];
 
   const topFood = [
-    { id: 1, name: "Croissant", description: "Pâtisserie française classique", price: "2.50€", imageUrl: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwildwildwhisk.com%2Fhow-to-make-croissant%2F&psig=AOvVaw0sx9F_KlZQrXULhNPkXx-Y&ust=1764006709944000&source=images&opi=89978449' },
-    { id: 2, name: "Muffin Myrtille", description: "Muffin moelleux aux myrtilles", price: "3.00€", imageUrl: 'https://odelices.ouest-france.fr/images/recettes/2013/muffins_aux_myrtilles.jpgs' },
-    { id: 3, name: "Sandwich Poulet", description: "Sandwich frais au poulet grillé", price: "6.50€", imageUrl: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.atelierdeschefs.fr%2Frecettes%2F30696%2Fsandwich-a-la-volaille-roquette-et-pomme-facon-hot-dog%2F&psig=AOvVaw1-8IC6_V80VbLqeuanFtBE&ust=1764006752909000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLD6rf3diJEDFQAAAAAdAAAAABAE' },
+    { id: 1, name: "Croissant", description: "Pâtisserie française classique", price: "2.50€", imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800' },
+    { id: 2, name: "Muffin Myrtille", description: "Muffin moelleux aux myrtilles", price: "3.00€", imageUrl: 'https://www.purevia.fr/_next/image?url=%2Fwp-content%2Fuploads%2F2024%2F04%2Fblueberry-muffins_compress-1.webp&w=3840&q=85' },
+    { id: 3, name: "Sandwich Poulet", description: "Sandwich frais au poulet grillé", price: "6.50€", imageUrl: 'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=800' },
   ];
   const dailyOffers = [
     { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
@@ -35,6 +76,20 @@ const HomeScreen = ({ navigation }) => {
     { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
     { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1517256064527-0fe794017e4a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
   ];
+
+  const renderHeroSlide = ({ item }) => (
+    <ImageBackground source={{ uri: item.imageUrl }} style={styles.heroCard} imageStyle={styles.heroImage}>
+      <View style={styles.heroOverlay} />
+      <View style={styles.heroContent}>
+        <Text style={styles.heroSubtitle}>{item.subtitle}</Text>
+        <Text style={styles.heroTitle}>{item.title}</Text>
+        <TouchableOpacity style={styles.heroButton} onPress={() => navigation.navigate('Menu')}>
+          <Text style={styles.heroButtonText}>{item.cta}</Text>
+          <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
 
   const renderFoodItem = ({ item }) => (
     <View style={styles.foodCard}>
@@ -46,6 +101,37 @@ const HomeScreen = ({ navigation }) => {
       </View>
     </View>
   );
+  
+  const renderNearbyCard = ({ item }) => (
+    <TouchableOpacity
+      key={item.id}
+      activeOpacity={0.9}
+      style={styles.nearbyCard}
+      onPress={() => navigation.navigate("CafeDetails", { cafe: item })}
+    >
+      <ImageBackground source={{ uri: item.imageUrl }} style={styles.nearbyImage} imageStyle={styles.nearbyImageStyle}>
+        <View style={styles.nearbyOverlay} />
+        <View style={styles.nearbyBadges}>
+          <View style={styles.nearbyBadge}>
+            <Ionicons name="walk" size={14} color="#3A2A23" />
+            <Text style={styles.nearbyBadgeText}>{item.distance}</Text>
+          </View>
+          <View style={styles.nearbyBadge}>
+            <Ionicons name="star" size={14} color="#3A2A23" />
+            <Text style={styles.nearbyBadgeText}>{item.rating}</Text>
+          </View>
+        </View>
+        <View style={styles.nearbyContent}>
+          <Text style={styles.nearbyCafeName}>{item.name}</Text>
+          <Text style={styles.nearbyVibe}>{item.vibe}</Text>
+          <TouchableOpacity style={styles.nearbyButton}>
+            <Text style={styles.nearbyButtonText}>Y aller</Text>
+            <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
 const topRestaurants = [
   { id: 1, name: "Le Gourmet", cuisine: "Cuisine française", rating: 4.9, price: "€€€", distance: "1.2 km", specialty: "Spécialité: Bœuf Bourguignon" },
   { id: 2, name: "Bella Italia", cuisine: "Cuisine italienne", rating: 4.7, price: "€€", distance: "0.8 km", specialty: "Spécialité: Pizza Napolitaine" },
@@ -53,15 +139,15 @@ const topRestaurants = [
   { id: 4, name: "Le Tajine d'Or", cuisine: "Cuisine marocaine", rating: 4.6, price: "€€", distance: "2.0 km", specialty: "Spécialité: Couscous Royal" },
 ];
   const recommendedCafes = [
-    { id: 1, name: "Café Mocha", desc: "Un mélange doux et chocolaté", distance: "1.5 km" },
-    { id: 2, name: "Espresso Royal", desc: "Un café fort pour bien démarrer", distance: "0.9 km" },
-    { id: 3, name: "Cappuccino Nocciola", desc: "Cappuccino noisette crémeux", distance: "2.3 km" },
+    { id: 1, name: "Café Mocha", desc: "Un mélange doux et chocolaté", distance: "1.5 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800' },
+    { id: 2, name: "Espresso Royal", desc: "Un café fort pour bien démarrer", distance: "0.9 km", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800' },
+    { id: 3, name: "Cappuccino Nocciola", desc: "Cappuccino noisette crémeux", distance: "2.3 km", imageUrl: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800' },
   ];
 
   const nearbyCafes = [
-    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5 },
-    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8 },
-    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2 },
+    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5, vibe: "Ambiance rétro chaleureuse", imageUrl: 'https://images.unsplash.com/photo-1493585552824-131927c85da2?w=900' },
+    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8, vibe: "Terrasse lumineuse", imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900' },
+    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2, vibe: "Idéal pour travailler", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900' },
   ];
 
   // Animation d'entrée des cartes
@@ -451,22 +537,52 @@ const topRestaurants = [
           </View>
         </View>
 
-        {/* TITRE ANIMÉ */}
+        {/* HERO CAROUSEL */}
         <CardWithAnimation index={0}>
-          <View style={styles.welcomeContainer}>
-            <Text style={styles.welcomeText}>Bonjour,</Text>
-            <Text style={styles.userName}>{user.username || "Utilisateur"} ☕</Text>
+          <View style={styles.heroCarouselContainer}>
+            <FlatList
+              data={heroSlides}
+              renderItem={renderHeroSlide}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              pagingEnabled
+              snapToInterval={width * 0.85 + 12}
+              decelerationRate="fast"
+              snapToAlignment="start"
+              contentContainerStyle={styles.heroCarouselContent}
+              onViewableItemsChanged={onHeroViewableItemsChanged}
+              viewabilityConfig={heroViewabilityConfig}
+            />
+            <View style={styles.heroPagination}>
+              {heroSlides.map((slide, index) => (
+                <View
+                  key={slide.id}
+                  style={[
+                    styles.heroDot,
+                    index === activeSlide && styles.heroDotActive,
+                  ]}
+                />
+              ))}
+            </View>
           </View>
         </CardWithAnimation>
 
+        {/* TITRE ANIMÉ */}
+        <CardWithAnimation index={1}>
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeText}>Bonjour, {displayName}</Text>
+            <Text style={styles.userName}>Prêt pour un moment café ☕</Text>
+          </View>
+        </CardWithAnimation>
 
         {/* BARRE DE RECHERCHE */}
-        <CardWithAnimation index={1}>
+        <CardWithAnimation index={2}>
           <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </CardWithAnimation>
 
         {/* CAROUSEL OFFRES DU JOUR */}
-        <CardWithAnimation index={2}>
+        <CardWithAnimation index={3}>
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>🎁 Offres du jour</Text>
@@ -486,22 +602,80 @@ const topRestaurants = [
           </View>
         </CardWithAnimation>
 
-        {/* DERNIER CAFÉ VISITÉ */}
-        <CardWithAnimation index={3}>
-          <TouchableOpacity style={styles.lastVisitedCard}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="time" size={24} color="#8B6F47" />
+        {/* TOP FOODS */}
+        <CardWithAnimation index={4}>
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionTitleRow}>
+              <Text style={styles.sectionTitle}>Top Foods</Text>
+              <TouchableOpacity>
+                <Text style={styles.sectionSubtitle}>Voir tout</Text>
+              </TouchableOpacity>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.lastVisitedTitle}>Dernier café visité</Text>
-              <Text style={styles.lastVisitedName}>{lastVisitedRestaurant}</Text>
+            <FlatList
+              data={topFood}
+              renderItem={renderFoodItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carouselContainer}
+            />
+          </View>
+        </CardWithAnimation>
+
+        {/* HIGHLIGHTS */}
+        <CardWithAnimation index={5}>
+          <View style={[styles.sectionContainer, styles.highlightSection]}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Vos derniers lieux</Text>
+              <Text style={styles.sectionSubtitle}>Revenez en un geste sur vos coups de cœur</Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#8B6F47" />
-          </TouchableOpacity>
+
+            <View style={styles.highlightRow}>
+              <TouchableOpacity
+                style={[styles.highlightCard, styles.highlightCardLeft, styles.cafeHighlight]}
+                activeOpacity={0.9}
+                onPress={() => navigation.navigate('CafeDetails', { cafe: lastVisitedCafe })}
+              >
+                <View style={styles.highlightHeader}>
+                  <View style={styles.highlightIconCircle}>
+                    <Ionicons name="cafe" size={20} color="#3A2A23" />
+                  </View>
+                  <Text style={styles.highlightChip}>Café</Text>
+                </View>
+                <Text style={styles.highlightName}>{lastVisitedCafe.name}</Text>
+                <Text style={styles.highlightDetail}>{lastVisitedCafe.detail}</Text>
+                <Text style={styles.highlightMeta}>{lastVisitedCafe.time}</Text>
+                <View style={styles.highlightFooter}>
+                  <Text style={styles.highlightLink}>Afficher le reçu</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.highlightCard, styles.restaurantHighlight]}
+                activeOpacity={0.9}
+                onPress={() => navigation.navigate('RestaurantDetails', { restaurant: lastVisitedRestaurant })}
+              >
+                <View style={styles.highlightHeader}>
+                  <View style={[styles.highlightIconCircle, styles.restaurantIconCircle]}>
+                    <Ionicons name="restaurant" size={20} color="#FFF" />
+                  </View>
+                  <Text style={styles.highlightChip}>Restaurant</Text>
+                </View>
+                <Text style={styles.highlightName}>{lastVisitedRestaurant.name}</Text>
+                <Text style={styles.highlightDetail}>{lastVisitedRestaurant.detail}</Text>
+                <Text style={styles.highlightMeta}>{lastVisitedRestaurant.time}</Text>
+                <View style={styles.highlightFooter}>
+                  <Text style={styles.highlightLink}>Gérer la réservation</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
         </CardWithAnimation>
 
         {/* CAFÉS À PROXIMITÉ */}
-        <CardWithAnimation index={4}>
+        <CardWithAnimation index={6}>
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
@@ -511,43 +685,19 @@ const topRestaurants = [
               <Text style={styles.sectionSubtitle}>Basé sur votre localisation</Text>
             </View>
 
-            <View style={styles.nearbyContainer}>
-              {nearbyCafes.map((cafe) => (
-                <TouchableOpacity
-                  key={cafe.id}
-                  style={styles.nearbyCard}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.nearbyIconCircle}>
-                    <Ionicons name="location" size={20} color="#8B6F47" />
-                  </View>
-                  
-                  <View style={styles.nearbyInfo}>
-                    <Text style={styles.nearbyCafeName}>{cafe.name}</Text>
-                    <View style={styles.nearbyMeta}>
-                      <Ionicons name="walk" size={14} color="#8B6F47" />
-                      <Text style={styles.nearbyDistance}>{cafe.distance}</Text>
-                      <View style={styles.ratingContainer}>
-                        <Ionicons name="star" size={14} color="#FFD700" />
-                        <Text style={styles.ratingText}>{cafe.rating}</Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.nearbyDirectionsButton}
-                    onPress={() => console.log('Navigation vers', cafe.name)}
-                  >
-                    <Ionicons name="navigate-circle" size={32} color="#8B6F47" />
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <FlatList
+              data={nearbyCafes}
+              renderItem={renderNearbyCard}
+              keyExtractor={item => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.nearbyCarousel}
+            />
           </View>
         </CardWithAnimation>
 
         {/* CAFÉS RECOMMANDÉS */}
-        <CardWithAnimation index={5}>
+        <CardWithAnimation index={7}>
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>☕ Recommandés pour vous</Text>
@@ -561,15 +711,20 @@ const topRestaurants = [
                 key={cafe.id}
                 style={styles.recommendedCard}
                 onPress={() => navigation.navigate("CafeDetails", { cafe })}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
               >
-                <View style={styles.cafeIconCircle}>
-                  <Ionicons name="cafe" size={28} color="#8B6F47" />
-                </View>
+                <Image source={{ uri: cafe.imageUrl }} style={styles.recommendedImage} />
                 
-                <View style={styles.cafeInfo}>
-                  <Text style={styles.cafeName}>{cafe.name}</Text>
+                <View style={styles.recommendedDetails}>
+                  <View style={styles.recommendedHeader}>
+                    <Text style={styles.cafeName}>{cafe.name}</Text>
+                    <View style={styles.recommendedBadge}>
+                      <Ionicons name="flash" size={12} color="#FFF" />
+                      <Text style={styles.recommendedBadgeText}>Suggestion</Text>
+                    </View>
+                  </View>
                   <Text style={styles.cafeDescription}>{cafe.desc}</Text>
+                  
                   <View style={styles.cafeMetaRow}>
                     <Ionicons name="location-outline" size={14} color="#8B6F47" />
                     <Text style={styles.cafeDistance}>{cafe.distance}</Text>
@@ -577,7 +732,7 @@ const topRestaurants = [
                 </View>
 
                 <TouchableOpacity
-                  style={styles.heartButton}
+                  style={styles.recommendedFavorite}
                   onPress={(e) => {
                     e.stopPropagation();
                     toggleFavorite(cafe.id);
@@ -585,8 +740,8 @@ const topRestaurants = [
                 >
                   <Ionicons 
                     name={favorites.includes(cafe.id) ? "heart" : "heart-outline"} 
-                    size={24} 
-                    color={favorites.includes(cafe.id) ? "#FF6B6B" : "#8B6F47"} 
+                    size={22} 
+                    color={favorites.includes(cafe.id) ? "#FF6B6B" : "#3A2A23"} 
                   />
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -603,7 +758,7 @@ const topRestaurants = [
         </CardWithAnimation>
 
         {/* BOUTON MENU PRINCIPAL */}
-        <CardWithAnimation index={6}>
+        <CardWithAnimation index={8}>
           <TouchableOpacity
             style={styles.mainButton}
             onPress={() => navigation.navigate('Menu')}
@@ -614,35 +769,6 @@ const topRestaurants = [
             <Ionicons name="arrow-forward" size={24} color="#FFF" />
           </TouchableOpacity>
         </CardWithAnimation>
-
-                {/* TOP FOODS */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionTitleRow}>
-            <Text style={styles.sectionTitle}>Top Foods</Text>
-            <TouchableOpacity>
-              <Text style={styles.sectionSubtitle}>Voir tout</Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={topFood}
-            renderItem={renderFoodItem}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.carouselContainer}
-          />
-        </View>
-
-        {/* DERNIER RESTAURANT VISITÉ */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Dernier restaurant visité</Text>
-          <View style={styles.lastVisitedRestaurantCard}>
-            <Text style={styles.lastVisitedRestaurantText}>{lastVisitedRestaurant}</Text>
-            <TouchableOpacity style={styles.lastVisitedRestaurantButton}>
-              <Text style={styles.lastVisitedRestaurantButtonText}>Commander à nouveau</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         <View style={{ height: 30 }} />
       </ScrollView>
@@ -986,6 +1112,74 @@ heartButton: {
   },
 
 
+  // HERO CAROUSEL
+  heroCarouselContainer: {
+    marginBottom: 25,
+  },
+  heroCarouselContent: {
+    paddingLeft: 20,
+    paddingRight: 8,
+  },
+  heroCard: {
+    width: width * 0.85,
+    height: 190,
+    borderRadius: 22,
+    marginRight: 12,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  heroImage: {
+    borderRadius: 22,
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  heroContent: {
+    padding: 18,
+  },
+  heroSubtitle: {
+    color: '#FFF',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  heroTitle: {
+    color: '#FFF',
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  heroButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF',
+    borderRadius: 30,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  heroButtonText: {
+    color: '#3A2A23',
+    fontWeight: '600',
+  },
+  heroPagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 6,
+  },
+  heroDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E0D7CF',
+  },
+  heroDotActive: {
+    width: 18,
+    backgroundColor: '#8B6F47',
+  },
+
   // SECTIONS
   sectionContainer: {
     marginBottom: 25,
@@ -1109,130 +1303,220 @@ heartButton: {
     fontWeight: 'bold',
   },
 
-  // LAST VISITED
-  lastVisitedCard: {
+  // HIGHLIGHT CARDS
+  highlightSection: {
+    paddingHorizontal: 20,
+  },
+  highlightRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  highlightCard: {
+    flex: 1,
     backgroundColor: '#FFF',
-    marginHorizontal: 20,
-    marginBottom: 25,
+    borderRadius: 18,
     padding: 18,
-    borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 3,
-    gap: 15,
   },
-  iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  highlightCardLeft: {
+    marginRight: 14,
+  },
+  cafeHighlight: {
+    backgroundColor: '#FFF',
+  },
+  restaurantHighlight: {
+    backgroundColor: '#FDEEE5',
+  },
+  highlightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  highlightIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFF5E6',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  lastVisitedTitle: {
-    fontSize: 13,
-    color: '#8B6F47',
+  restaurantIconCircle: {
+    backgroundColor: '#8B6F47',
+  },
+  highlightChip: {
+    backgroundColor: 'rgba(58,42,35,0.1)',
+    color: '#3A2A23',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  highlightName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3A2A23',
     marginBottom: 4,
   },
-  lastVisitedName: {
-    fontSize: 17,
-    fontWeight: 'bold',
+  highlightDetail: {
+    fontSize: 14,
+    color: '#6B4F33',
+    marginBottom: 6,
+  },
+  highlightMeta: {
+    fontSize: 13,
+    color: '#A38B78',
+    marginBottom: 14,
+  },
+  highlightFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  highlightLink: {
+    fontSize: 13,
+    fontWeight: '600',
     color: '#3A2A23',
   },
 
   // NEARBY CAFES
-  nearbyContainer: {
-    paddingHorizontal: 20,
+  nearbyCarousel: {
+    paddingLeft: 20,
+    paddingRight: 8,
   },
   nearbyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 14,
-    marginBottom: 12,
+    width: width * 0.6,
+    height: 200,
+    borderRadius: 18,
+    marginRight: 12,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-    gap: 12,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  nearbyIconCircle: {
-    width: 45,
-    height: 45,
-    borderRadius: 23,
-    backgroundColor: '#FFF5E6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nearbyInfo: {
+  nearbyImage: {
     flex: 1,
   },
-  nearbyCafeName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#3A2A23',
-    marginBottom: 6,
+  nearbyImageStyle: {
+    borderRadius: 18,
   },
-  nearbyMeta: {
+  nearbyOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  nearbyBadges: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  nearbyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  nearbyBadgeText: {
+    color: '#3A2A23',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  nearbyContent: {
+    marginTop: 'auto',
+    padding: 18,
+  },
+  nearbyCafeName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  nearbyVibe: {
+    fontSize: 13,
+    color: '#F5F1EC',
+    marginBottom: 12,
+  },
+  nearbyButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  nearbyDistance: {
+  nearbyButtonText: {
+    color: '#3A2A23',
+    fontWeight: '600',
     fontSize: 13,
-    color: '#8B6F47',
-    marginRight: 8,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: '#FFF5E6',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#8B6F47',
-  },
-  nearbyDirectionsButton: {
-    padding: 5,
   },
 
   // RECOMMENDED CARD
   recommendedCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#FFF',
     marginHorizontal: 20,
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 12,
+    borderRadius: 18,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
-    gap: 12,
+    overflow: 'hidden',
+    position: 'relative',
   },
-  cafeIconCircle: {
-    width: 55,
-    height: 55,
-    borderRadius: 28,
-    backgroundColor: '#FFF5E6',
+  recommendedImage: {
+    width: '100%',
+    height: 165,
+  },
+  recommendedDetails: {
+    padding: 16,
+  },
+  recommendedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recommendedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8B6F47',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  recommendedBadgeText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  recommendedFavorite: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cafeInfo: {
-    flex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
   },
   cafeName: {
     fontSize: 17,
@@ -1332,37 +1616,6 @@ heartButton: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#3A2A23',
-  },
-  lastVisitedRestaurantCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 15,
-    marginHorizontal: 20,
-    marginTop: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  lastVisitedRestaurantText: {
-    fontSize: 16,
-    color: '#3A2A23',
-    fontWeight: 'bold',
-  },
-  lastVisitedRestaurantButton: {
-    backgroundColor: '#8B6F47',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  lastVisitedRestaurantButtonText: {
-    color: '#FFF',
-    fontSize: 13,
-    fontWeight: 'bold',
   },
 });
 export default HomeScreen;
