@@ -708,9 +708,13 @@ const topRestaurants = [
         ]}
       >
         <View style={styles.sidebarHeader}>
-          <View style={styles.profileCircle}>
-            <Ionicons name="person" size={50} color="#FFF" />
-          </View>
+         <View style={styles.profileCircle}>
+  <Image 
+    source={{ uri: user.profileImage || 'https://scontent.ftun8-1.fna.fbcdn.net/v/t39.30808-1/494515795_2835687209954279_9000285933114725111_n.jpg?stp=cp6_dst-jpg_s160x160_tt6&_nc_cat=106&ccb=1-7&_nc_sid=e99d92&_nc_ohc=9cWJQ5lsxMYQ7kNvwEGnUXM&_nc_oc=AdnYnOB1k9HTamrAEuhxrevj3J6RAZqDDlJ2G4sAFNpYpslN-d0Ge9nS2LjuKhsADvg&_nc_zt=24&_nc_ht=scontent.ftun8-1.fna&_nc_gid=qW1bUP4Y6gT6YjrNGBYJlQ&oh=00_Afj_RT6XU8-6X-M7R-29GwMlruzbdaaOH5R1w4wpKJvApw&oe=692CBDC6' }} 
+    style={styles.profileImage} 
+  />
+</View>
+
           <Text style={styles.sidebarName}>{user.username || "Utilisateur"}</Text>
           <Text style={styles.sidebarEmail}>{user.email || "user@email.com"}</Text>
           
@@ -735,13 +739,8 @@ const topRestaurants = [
           contentContainerStyle={styles.sidebarMenuContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.sidebarImageContainer}>
-            <Image
-              source={{ uri: 'https://scontent.ftun8-1.fna.fbcdn.net/v/t39.30808-6/494515795_2835687209954279_9000285933114725111_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=9cWJQ5lsxMYQ7kNvwEGnUXM&_nc_oc=AdnYnOB1k9HTamrAEuhxrevj3J6RAZqDDlJ2G4sAFNpYpslN-d0Ge9nS2LjuKhsADvg&_nc_zt=23&_nc_ht=scontent.ftun8-1.fna&_nc_gid=GucrSPJ7QYZQZy-_Wr2cJg&oh=00_AfjUkIwvg3vzcQd_wdUpbqufBXO2V494w1BXcOvcYenSVQ&oe=692CA608' }}
-              style={styles.sidebarImage}
-            />
-          </View>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('ProfileScreen'); toggleSidebar(); }}>
+       
+          <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('Profile'); toggleSidebar(); }}>
             <Ionicons name="person-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mon Profil</Text>
           </TouchableOpacity>
@@ -1984,6 +1983,21 @@ heartButton: {
     height: 110,
     textAlignVertical: 'top',
   },
+    profileCircle: {
+    width: 100,          // largeur du cercle
+    height: 100,         // hauteur du cercle
+    borderRadius: 50,    // moitié de la largeur/hauteur pour un cercle parfait
+    overflow: 'hidden',  // pour que l'image ne dépasse pas
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,      // optionnel : bordure
+    borderColor: '#ccc', // optionnel : couleur bordure
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover', // remplissage complet du cercle
+  },
   dualRow: {
     flexDirection: 'row',
     gap: 12,
@@ -2139,13 +2153,19 @@ heartButton: {
     color: '#3A2A23',
   },
   sidebarImageContainer: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
     overflow: 'hidden',
-    borderRadius: 75,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#6B4F33', // Couleur de fond si l'image ne charge pas
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   sidebarImage: {
     width: '100%',

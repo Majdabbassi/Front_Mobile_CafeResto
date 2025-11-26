@@ -105,6 +105,7 @@ export default function App() {
         <Stack.Screen name="BestCafes" component={BestCafesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CoworkingDetails" component={CoworkingDetailsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CaffeDating" component={CaffeDatingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

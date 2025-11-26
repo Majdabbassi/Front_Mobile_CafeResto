@@ -406,6 +406,18 @@ const CafeListScreen = ({ navigation }) => {
                     <Ionicons name="calendar-outline" size={20} color="#FFF" />
                     <Text style={styles.actionButtonText}>Réserver</Text>
                   </TouchableOpacity>
+                  {selectedCafe.coworking && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.coworkingButton]}
+                      onPress={() => {
+                        setModalVisible(false);
+                        navigation.navigate('CoworkingDetails', { cafe: selectedCafe });
+                      }}
+                    >
+                      <Ionicons name="briefcase-outline" size={20} color="#FFF" />
+                      <Text style={styles.actionButtonText}>Espace Coworking</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </ScrollView>
             )}
