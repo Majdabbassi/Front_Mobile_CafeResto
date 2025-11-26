@@ -15,6 +15,7 @@ import HomeScreen from './screens/HomeScreen';
 import LikesScreen from './screens/LikesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import LoyaltyScreen from './screens/LoyaltyScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import OfferDetailsScreen from './screens/OfferDetailsScreen';
 import CafeListScreen from './screens/CafeListScreen';
@@ -92,6 +93,7 @@ export default function App() {
         <Stack.Screen name="Likes" component={LikesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Loyalty" component={LoyaltyScreen} options={{ headerShown: false }} />
         <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />

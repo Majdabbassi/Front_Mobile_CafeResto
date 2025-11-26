@@ -7,6 +7,10 @@ import { Ionicons } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 console.log('Screen width:', width);
 
+const heroCardWidth = width * 0.85;
+const heroSnapInterval = heroCardWidth + 12;
+const fallbackOfferImage = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=80';
+
 const HomeScreen = ({ navigation }) => {
   const route = useRoute();
   const user = route?.params?.user || {};
@@ -16,18 +20,25 @@ const HomeScreen = ({ navigation }) => {
   const [unseenOffers, setUnseenOffers] = useState(2);
   const [isNotificationModalVisible, setNotificationModalVisible] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [reclamationVisible, setReclamationVisible] = useState(false);
+  const [reclamationData, setReclamationData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    orderNumber: "",
+    reclamationType: "product_quality",
+    subject: "",
+    description: "",
+    urgency: "medium",
+    attachments: [],
+    preferredContact: "email"
+  });
   
   // Animations
   const slideAnim = useRef(new Animated.Value(-width * 0.75)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const cardAnimations = useRef([...Array(9)].map(() => new Animated.Value(0))).current;
+  const cardAnimations = useRef([...Array(10)].map(() => new Animated.Value(0))).current;
   const notificationPulse = useRef(new Animated.Value(1)).current;
-  const heroViewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 80 }).current;
-  const onHeroViewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems && viewableItems.length > 0 && typeof viewableItems[0].index === 'number') {
-      setActiveSlide(viewableItems[0].index);
-    }
-  }).current;
 
   const displayName = user?.username?.trim?.() ? user.username : "Client Café";
   const lastVisitedCafe = {
@@ -71,10 +82,10 @@ const HomeScreen = ({ navigation }) => {
     { id: 3, name: "Sandwich Poulet", description: "Sandwich frais au poulet grillé", price: "6.50€", imageUrl: 'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=800' },
   ];
   const dailyOffers = [
-    { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 2, name: "Espresso House", offer: "1 Espresso acheté = 1 offert", visits: 94, distance: "1.2 km", imageUrl: 'https://images.unsplash.com/photo-1525610553908-0ff7c7d4421d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1517256064527-0fe794017e4a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1464306076886-da185f6a9d12?w=1600&auto=format&fit=crop&q=80' },
+    { id: 2, name: "Espresso House", offer: "1 Espresso acheté = 1 offert", visits: 94, distance: "1.2 km", imageUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=1600&auto=format&fit=crop&q=80' },
+    { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&auto=format&fit=crop&q=80' },
+    { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&auto=format&fit=crop&q=80' },
   ];
 
   const renderHeroSlide = ({ item }) => (
@@ -83,7 +94,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.heroContent}>
         <Text style={styles.heroSubtitle}>{item.subtitle}</Text>
         <Text style={styles.heroTitle}>{item.title}</Text>
-        <TouchableOpacity style={styles.heroButton} onPress={() => navigation.navigate('Menu')}>
+        <TouchableOpacity style={styles.heroButton} onPress={() => navigation.navigate('MenuScreen')}>
           <Text style={styles.heroButtonText}>{item.cta}</Text>
           <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
         </TouchableOpacity>
@@ -132,6 +143,27 @@ const HomeScreen = ({ navigation }) => {
       </ImageBackground>
     </TouchableOpacity>
   );
+
+  const CardWithAnimation = ({ children, index }) => {
+    const scale = cardAnimations[index]?.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.8, 1],
+    }) || 1;
+
+    const opacity = cardAnimations[index] || 1;
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          opacity,
+        }}
+      >
+        {children}
+      </Animated.View>
+    );
+  };
+
 const topRestaurants = [
   { id: 1, name: "Le Gourmet", cuisine: "Cuisine française", rating: 4.9, price: "€€€", distance: "1.2 km", specialty: "Spécialité: Bœuf Bourguignon" },
   { id: 2, name: "Bella Italia", cuisine: "Cuisine italienne", rating: 4.7, price: "€€", distance: "0.8 km", specialty: "Spécialité: Pizza Napolitaine" },
@@ -142,6 +174,26 @@ const topRestaurants = [
     { id: 1, name: "Café Mocha", desc: "Un mélange doux et chocolaté", distance: "1.5 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800' },
     { id: 2, name: "Espresso Royal", desc: "Un café fort pour bien démarrer", distance: "0.9 km", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800' },
     { id: 3, name: "Cappuccino Nocciola", desc: "Cappuccino noisette crémeux", distance: "2.3 km", imageUrl: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800' },
+  ];
+
+  const reclamationTypes = [
+    { value: "product_quality", label: "Qualité produit", icon: "cafe-outline" },
+    { value: "service", label: "Service", icon: "people-outline" },
+    { value: "billing", label: "Facturation", icon: "card-outline" },
+    { value: "delivery", label: "Livraison", icon: "bicycle-outline" },
+    { value: "app", label: "Application", icon: "phone-portrait-outline" },
+  ];
+
+  const urgencyOptions = [
+    { value: "low", label: "Basse" },
+    { value: "medium", label: "Normale" },
+    { value: "high", label: "Haute" },
+  ];
+
+  const contactOptions = [
+    { value: "email", label: "Email" },
+    { value: "phone", label: "Téléphone" },
+    { value: "chat", label: "Chat in-app" },
   ];
 
   const nearbyCafes = [
@@ -295,29 +347,53 @@ const topRestaurants = [
     cafe.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const CardWithAnimation = ({ children, index }) => {
-    const scale = cardAnimations[index]?.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.8, 1],
-    }) || 1;
-
-    const opacity = cardAnimations[index] || 1;
-
-    return (
-      <Animated.View
-        style={{
-          transform: [{ scale }],
-          opacity,
-        }}
-      >
-        {children}
-      </Animated.View>
+  const handleReclamationSubmit = () => {
+    console.log("Reclamation submitted:", reclamationData);
+    alert(
+      `Réclamation envoyée !\n\nMerci ${reclamationData.name || 'Client'}.\nNous vous répondrons sous 24h.\nRéférence: #${Math.random().toString(36).substr(2, 9).toUpperCase()}`
     );
+    setReclamationVisible(false);
+    setReclamationData({
+      name: "",
+      email: "",
+      phone: "",
+      orderNumber: "",
+      reclamationType: "product_quality",
+      subject: "",
+      description: "",
+      urgency: "medium",
+      attachments: [],
+      preferredContact: "email"
+    });
+  };
+
+  const updateReclamationField = (field, value) => {
+    setReclamationData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddAttachment = () => {
+    setReclamationData(prev => ({
+      ...prev,
+      attachments: [
+        ...prev.attachments,
+        {
+          id: Date.now(),
+          name: `capture-${prev.attachments.length + 1}.png`
+        }
+      ],
+    }));
+  };
+
+  const handleRemoveAttachment = (id) => {
+    setReclamationData(prev => ({
+      ...prev,
+      attachments: prev.attachments.filter(att => att.id !== id),
+    }));
   };
 
   const renderOfferItem = ({ item }) => (
     <View style={styles.carouselCard}>
-      <Image source={{ uri: 'https://www.cocktailmag.fr/media/k2/items/cache/e529a8dc22bd84a37f6f8ae6b8ce40d3_M.jpg' }} style={styles.carouselImage} />
+      <Image source={{ uri: item.imageUrl || fallbackOfferImage }} style={styles.carouselImage} />
       <View style={styles.offerBadge}>
         <Text style={styles.offerBadgeText}>HOT</Text>
       </View>
@@ -411,6 +487,198 @@ const topRestaurants = [
         </View>
       </Modal>
 
+      {/* Reclamation Modal */}
+      <Modal visible={reclamationVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Soumettre une réclamation</Text>
+              <TouchableOpacity onPress={() => setReclamationVisible(false)}>
+                <Ionicons name="close" size={24} color="#3A2A23" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.formIntro}>
+                Sélectionnez le type de réclamation et donnez-nous quelques détails afin que notre équipe puisse agir rapidement.
+              </Text>
+
+              <Text style={styles.formLabel}>Type de réclamation</Text>
+              <View style={styles.chipsContainer}>
+                {reclamationTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type.value}
+                    style={[
+                      styles.typeChip,
+                      reclamationData.reclamationType === type.value && styles.typeChipActive,
+                    ]}
+                    onPress={() => updateReclamationField('reclamationType', type.value)}
+                  >
+                    <Ionicons
+                      name={type.icon}
+                      size={18}
+                      color={reclamationData.reclamationType === type.value ? '#FFF' : '#8B6F47'}
+                    />
+                    <Text
+                      style={[
+                        styles.typeChipText,
+                        reclamationData.reclamationType === type.value && styles.typeChipTextActive,
+                      ]}
+                    >
+                      {type.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={styles.dualRow}>
+                <View style={styles.flexItem}>
+                  <Text style={styles.formLabel}>Nom complet</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="Votre nom"
+                    value={reclamationData.name}
+                    onChangeText={(text) => updateReclamationField('name', text)}
+                  />
+                </View>
+                <View style={styles.flexItem}>
+                  <Text style={styles.formLabel}>Numéro de commande</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="#000123"
+                    value={reclamationData.orderNumber}
+                    onChangeText={(text) => updateReclamationField('orderNumber', text)}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.dualRow}>
+                <View style={styles.flexItem}>
+                  <Text style={styles.formLabel}>Email</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="exemple@email.com"
+                    value={reclamationData.email}
+                    keyboardType="email-address"
+                    onChangeText={(text) => updateReclamationField('email', text)}
+                  />
+                </View>
+                <View style={styles.flexItem}>
+                  <Text style={styles.formLabel}>Téléphone</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="+216 ..."
+                    value={reclamationData.phone}
+                    keyboardType="phone-pad"
+                    onChangeText={(text) => updateReclamationField('phone', text)}
+                  />
+                </View>
+              </View>
+
+              <Text style={styles.formLabel}>Sujet</Text>
+              <TextInput
+                style={styles.formInput}
+                placeholder="Sujet de votre réclamation"
+                value={reclamationData.subject}
+                onChangeText={(text) => updateReclamationField('subject', text)}
+              />
+
+              <Text style={styles.formLabel}>Description</Text>
+              <TextInput
+                style={[styles.formInput, styles.formTextarea]}
+                placeholder="Décrivez votre problème..."
+                value={reclamationData.description}
+                multiline
+                onChangeText={(text) => updateReclamationField('description', text)}
+              />
+
+              <Text style={styles.formLabel}>Urgence</Text>
+              <View style={styles.chipsContainer}>
+                {urgencyOptions.map(option => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[
+                      styles.optionChip,
+                      reclamationData.urgency === option.value && styles.optionChipActive,
+                    ]}
+                    onPress={() => updateReclamationField('urgency', option.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.optionChipText,
+                        reclamationData.urgency === option.value && styles.optionChipTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.formLabel}>Contact préféré</Text>
+              <View style={styles.chipsContainer}>
+                {contactOptions.map(option => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[
+                      styles.optionChip,
+                      reclamationData.preferredContact === option.value && styles.optionChipActive,
+                    ]}
+                    onPress={() => updateReclamationField('preferredContact', option.value)}
+                  >
+                    <Ionicons
+                      name={
+                        option.value === 'email'
+                          ? 'mail-outline'
+                          : option.value === 'phone'
+                          ? 'call-outline'
+                          : 'chatbubble-ellipses-outline'
+                      }
+                      size={16}
+                      color={reclamationData.preferredContact === option.value ? '#FFF' : '#8B6F47'}
+                    />
+                    <Text
+                      style={[
+                        styles.optionChipText,
+                        reclamationData.preferredContact === option.value && styles.optionChipTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={styles.attachmentsHeader}>
+                <Text style={styles.formLabel}>Captures / Pièces jointes</Text>
+                <TouchableOpacity onPress={handleAddAttachment}>
+                  <Text style={styles.attachmentAction}>+ Ajouter</Text>
+                </TouchableOpacity>
+              </View>
+              {reclamationData.attachments.length === 0 ? (
+                <Text style={styles.attachmentsEmpty}>Aucune pièce jointe pour le moment.</Text>
+              ) : (
+                <View style={styles.attachmentsList}>
+                  {reclamationData.attachments.map((att) => (
+                    <View key={att.id} style={styles.attachmentItem}>
+                      <Ionicons name="document-text-outline" size={18} color="#8B6F47" />
+                      <Text style={styles.attachmentName}>{att.name}</Text>
+                      <TouchableOpacity onPress={() => handleRemoveAttachment(att.id)}>
+                        <Ionicons name="close" size={18} color="#8B6F47" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              <TouchableOpacity style={styles.submitButton} onPress={handleReclamationSubmit}>
+                <Text style={styles.submitButtonText}>Envoyer la réclamation</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Overlay sombre */}
         <Animated.View
           style={[styles.overlay, { opacity: fadeAnim }]}
@@ -454,13 +722,17 @@ const topRestaurants = [
           )}
         </View>
 
-        <View style={styles.sidebarMenu}>
+        <ScrollView
+          style={styles.sidebarMenu}
+          contentContainerStyle={styles.sidebarMenuContent}
+          showsVerticalScrollIndicator={false}
+        >
           <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Profile', { user }); }}>
             <Ionicons name="person-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mon Profil</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Menu'); }}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('MenuScreen'); }}>
             <Ionicons name="restaurant-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Menu</Text>
           </TouchableOpacity>
@@ -475,9 +747,26 @@ const topRestaurants = [
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('History'); }}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              toggleSidebar();
+              navigation.navigate('Loyalty', { user });
+            }}
+          >
             <Ionicons name="gift-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mes Récompenses</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              toggleSidebar();
+              setReclamationVisible(true);
+            }}
+          >
+            <Ionicons name="alert-circle-outline" size={24} color="#3A2A23" />
+            <Text style={styles.menuText}>Soumettre une réclamation</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('History'); }}>
@@ -499,7 +788,7 @@ const topRestaurants = [
             <Ionicons name="log-out-outline" size={24} color="#D32F2F" />
             <Text style={[styles.menuText, { color: '#D32F2F' }]}>Déconnexion</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </Animated.View>
 
       {/* CONTENU PRINCIPAL */}
@@ -547,12 +836,20 @@ const topRestaurants = [
               horizontal
               showsHorizontalScrollIndicator={false}
               pagingEnabled
-              snapToInterval={width * 0.85 + 12}
+              snapToInterval={heroSnapInterval}
               decelerationRate="fast"
               snapToAlignment="start"
               contentContainerStyle={styles.heroCarouselContent}
-              onViewableItemsChanged={onHeroViewableItemsChanged}
-              viewabilityConfig={heroViewabilityConfig}
+              onMomentumScrollEnd={({ nativeEvent }) => {
+                const offset = nativeEvent.contentOffset.x;
+                const index = Math.round(offset / heroSnapInterval);
+                setActiveSlide(index);
+              }}
+              getItemLayout={(data, index) => ({
+                length: heroSnapInterval,
+                offset: heroSnapInterval * index,
+                index,
+              })}
             />
             <View style={styles.heroPagination}>
               {heroSlides.map((slide, index) => (
@@ -757,11 +1054,37 @@ const topRestaurants = [
           </View>
         </CardWithAnimation>
 
-        {/* BOUTON MENU PRINCIPAL */}
+        {/* SUPPORT & RECLAMATIONS */}
         <CardWithAnimation index={8}>
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="help-buoy" size={24} color="#8B6F47" />
+                <Text style={styles.sectionTitle}>Support & Réclamations</Text>
+              </View>
+              <Text style={styles.sectionSubtitle}>Besoin d'aide ? Contactez-nous</Text>
+            </View>
+
+            <View style={styles.supportCard}>
+              <Text style={styles.supportText}>
+                Signalez un problème de commande ou partagez votre retour d'expérience. Notre équipe vous répond sous 24h.
+              </Text>
+              <TouchableOpacity
+                style={styles.supportButton}
+                onPress={() => setReclamationVisible(true)}
+              >
+                <Ionicons name="mail-open" size={18} color="#FFF" />
+                <Text style={styles.supportButtonText}>Envoyer une réclamation</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </CardWithAnimation>
+
+        {/* BOUTON MENU PRINCIPAL */}
+        <CardWithAnimation index={9}>
           <TouchableOpacity
             style={styles.mainButton}
-            onPress={() => navigation.navigate('Menu')}
+            onPress={() => navigation.navigate('MenuScreen')}
             activeOpacity={0.9}
           >
             <Ionicons name="restaurant" size={24} color="#FFF" />
@@ -945,6 +1268,9 @@ heartButton: {
   sidebarMenu: {
     flex: 1,
     paddingTop: 20,
+  },
+  sidebarMenuContent: {
+    paddingBottom: 30,
   },
   menuItem: {
     flexDirection: 'row',
@@ -1501,6 +1827,52 @@ heartButton: {
     fontSize: 11,
     fontWeight: '600',
   },
+  supportCard: {
+    backgroundColor: '#FFF',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  supportText: {
+    fontSize: 14,
+    color: '#6B4F33',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  supportButton: {
+    backgroundColor: '#8B6F47',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  supportButtonText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  mainButton: {
+    marginHorizontal: 20,
+    backgroundColor: '#8B6F47',
+    borderRadius: 16,
+    paddingVertical: 18,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   recommendedFavorite: {
     position: 'absolute',
     top: 14,
@@ -1562,6 +1934,132 @@ heartButton: {
   },
   modalCloseButton: {
     padding: 5,
+  },
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#3A2A23',
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  formIntro: {
+    fontSize: 13,
+    color: '#6B4F33',
+    lineHeight: 18,
+    marginBottom: 14,
+  },
+  formInput: {
+    backgroundColor: '#F7F3EE',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#3A2A23',
+  },
+  formTextarea: {
+    height: 110,
+    textAlignVertical: 'top',
+  },
+  dualRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  flexItem: {
+    flex: 1,
+  },
+  chipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 10,
+  },
+  typeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#EFE6DB',
+  },
+  typeChipActive: {
+    backgroundColor: '#8B6F47',
+  },
+  typeChipText: {
+    color: '#8B6F47',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  typeChipTextActive: {
+    color: '#FFF',
+  },
+  optionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#D8C9BB',
+  },
+  optionChipActive: {
+    backgroundColor: '#F0E1D2',
+    borderColor: '#8B6F47',
+  },
+  optionChipText: {
+    color: '#6B4F33',
+    fontWeight: '500',
+    fontSize: 13,
+  },
+  optionChipTextActive: {
+    color: '#3A2A23',
+  },
+  attachmentsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  attachmentAction: {
+    color: '#8B6F47',
+    fontWeight: '600',
+  },
+  attachmentsEmpty: {
+    fontSize: 13,
+    color: '#A1887F',
+    marginBottom: 8,
+  },
+  attachmentsList: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  attachmentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F7F3EE',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  attachmentName: {
+    flex: 1,
+    color: '#3A2A23',
+    fontWeight: '500',
+    fontSize: 13,
+  },
+  submitButton: {
+    backgroundColor: '#8B6F47',
+    marginTop: 20,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   notificationItem: {
     flexDirection: 'row',
