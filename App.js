@@ -18,6 +18,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import LoyaltyScreen from './screens/LoyaltyScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import OfferDetailsScreen from './screens/OfferDetailsScreen';
+import CafeDetailsScreen from './screens/CafeDetailsScreen';
 import CafeListScreen from './screens/CafeListScreen';
 import ServeurScreen from './screens/ServeurScreen';
 import BestCafesScreen from './screens/BestCafesScreen';
@@ -100,6 +101,7 @@ export default function App() {
         <Stack.Screen name="Loyalty" component={LoyaltyScreen} options={{ headerShown: false }} />
         <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CafeDetails" component={CafeDetailsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Serveur" component={ServeurScreen} options={{ headerShown: false }} />
         <Stack.Screen name="BestCafes" component={BestCafesScreen} options={{ headerShown: false }} />

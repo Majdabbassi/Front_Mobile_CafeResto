@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import SearchInput from '../components/SearchInput';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, ScrollView, TextInput, FlatList, Image, ImageBackground, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, ScrollView, TextInput, FlatList, Image, ImageBackground, Modal, Linking, Platform } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -33,6 +33,75 @@ const HomeScreen = ({ navigation }) => {
     attachments: [],
     preferredContact: "email"
   });
+
+  const openGoogleMaps = (latitude, longitude) => {
+    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+    const latLng = `${latitude},${longitude}`;
+    const label = 'Destination';
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`
+    });
+
+    Linking.openURL(url);
+  };
+
+  const renderNearbyCard = ({ item }) => (
+    <TouchableOpacity
+      key={item.id}
+      activeOpacity={0.9}
+      style={styles.nearbyCard}
+      onPress={() => navigation.navigate("CafeDetails", { cafe: item })}
+    >
+      <ImageBackground source={{ uri: item.imageUrl }} style={styles.nearbyImage} imageStyle={styles.nearbyImageStyle}>
+        <View style={styles.nearbyOverlay} />
+        <View style={styles.nearbyBadges}>
+          <View style={styles.nearbyBadge}>
+            <Ionicons name="walk" size={14} color="#3A2A23" />
+            <Text style={styles.nearbyBadgeText}>{item.distance}</Text>
+          </View>
+          <View style={styles.nearbyBadge}>
+            <Ionicons name="star" size={14} color="#3A2A23" />
+            <Text style={styles.nearbyBadgeText}>{item.rating}</Text>
+          </View>
+        </View>
+        <View style={styles.nearbyContent}>
+          <Text style={styles.nearbyCafeName}>{item.name}</Text>
+          <Text style={styles.nearbyVibe}>{item.vibe}</Text>
+          {item.coworking && (
+            <TouchableOpacity style={styles.coworkingButton} onPress={() => navigation.navigate("CoworkingDetails", { cafe: item })}>
+              <Ionicons name="briefcase-outline" size={16} color="#FFF" />
+              <Text style={styles.coworkingButtonText}>Coworking</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.nearbyButton} onPress={() => openGoogleMaps(item.latitude, item.longitude)}>
+            <Text style={styles.nearbyButtonText}>Y aller</Text>
+            <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
+
+  const CardWithAnimation = ({ children, index }) => {
+    const scale = cardAnimations[index]?.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.8, 1],
+    }) || 1;
+
+    const opacity = cardAnimations[index] || 1;
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          opacity,
+        }}
+      >
+        {children}
+      </Animated.View>
+    );
+  };
   
   // Animations
   const slideAnim = useRef(new Animated.Value(-width * 0.75)).current;
@@ -114,63 +183,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
     </View>
   );
-  
-  const renderNearbyCard = ({ item }) => (
-    <TouchableOpacity
-      key={item.id}
-      activeOpacity={0.9}
-      style={styles.nearbyCard}
-      onPress={() => navigation.navigate("CafeDetails", { cafe: item })}
-    >
-      <ImageBackground source={{ uri: item.imageUrl }} style={styles.nearbyImage} imageStyle={styles.nearbyImageStyle}>
-        <View style={styles.nearbyOverlay} />
-        <View style={styles.nearbyBadges}>
-          <View style={styles.nearbyBadge}>
-            <Ionicons name="walk" size={14} color="#3A2A23" />
-            <Text style={styles.nearbyBadgeText}>{item.distance}</Text>
-          </View>
-          <View style={styles.nearbyBadge}>
-            <Ionicons name="star" size={14} color="#3A2A23" />
-            <Text style={styles.nearbyBadgeText}>{item.rating}</Text>
-          </View>
-        </View>
-        <View style={styles.nearbyContent}>
-          <Text style={styles.nearbyCafeName}>{item.name}</Text>
-          <Text style={styles.nearbyVibe}>{item.vibe}</Text>
-          {item.coworking && (
-            <TouchableOpacity style={styles.coworkingButton} onPress={() => navigation.navigate("CoworkingDetails", { cafe: item })}>
-              <Ionicons name="briefcase-outline" size={16} color="#FFF" />
-              <Text style={styles.coworkingButtonText}>Coworking</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={styles.nearbyButton}>
-            <Text style={styles.nearbyButtonText}>Y aller</Text>
-            <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
 
-  const CardWithAnimation = ({ children, index }) => {
-    const scale = cardAnimations[index]?.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.8, 1],
-    }) || 1;
-
-    const opacity = cardAnimations[index] || 1;
-
-    return (
-      <Animated.View
-        style={{
-          transform: [{ scale }],
-          opacity,
-        }}
-      >
-        {children}
-      </Animated.View>
-    );
-  };
 
 const topRestaurants = [
   { id: 1, name: "Le Gourmet", cuisine: "Cuisine française", rating: 4.9, price: "€€€", distance: "1.2 km", specialty: "Spécialité: Bœuf Bourguignon" },
@@ -205,9 +218,9 @@ const topRestaurants = [
   ];
 
   const nearbyCafes = [
-    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5, vibe: "Ambiance rétro chaleureuse", imageUrl: 'https://images.unsplash.com/photo-1493585552824-131927c85da2?w=900', coworking: { powerOutlets: 'Nombreux', wifiQuality: 'Excellent', quietZone: true, availableSeats: '5-10' } },
-    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8, vibe: "Terrasse lumineuse", imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900', coworking: { powerOutlets: 'Limités', wifiQuality: 'Bon', quietZone: false, availableSeats: '2-4' } },
-    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2, vibe: "Idéal pour travailler", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900', coworking: { powerOutlets: 'Quelques-uns', wifiQuality: 'Moyen', quietZone: true, availableSeats: '1-2' } },
+    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5, vibe: "Ambiance rétro chaleureuse", imageUrl: 'https://images.unsplash.com/photo-1493585552824-131927c85da2?w=900', coworking: { powerOutlets: 'Nombreux', wifiQuality: 'Excellent', quietZone: true, availableSeats: '5-10' }, latitude: 48.8566, longitude: 2.3522 }, // Paris center
+    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8, vibe: "Terrasse lumineuse", imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900', coworking: { powerOutlets: 'Limités', wifiQuality: 'Bon', quietZone: false, availableSeats: '2-4' }, latitude: 48.8606, longitude: 2.3376 }, // Near Louvre
+    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2, vibe: "Idéal pour travailler", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900', coworking: { powerOutlets: 'Quelques-uns', wifiQuality: 'Moyen', quietZone: true, availableSeats: '1-2' }, latitude: 48.8738, longitude: 2.2950 }, // Near Arc de Triomphe
   ];
 
   // Animation d'entrée des cartes
@@ -435,7 +448,7 @@ const topRestaurants = [
 
         <TouchableOpacity
           style={styles.carouselButton}
-          onPress={() => navigation.navigate("OfferDetails", { cafe: item })}
+          onPress={() => navigation.navigate("CafeDetails", { cafe: item })}
         >
           <Text style={styles.carouselButtonText}>Profiter maintenant</Text>
           <Ionicons name="arrow-forward" size={16} color="#FFF" />
@@ -1116,6 +1129,15 @@ const topRestaurants = [
         </CardWithAnimation>
 
         <View style={{ height: 30 }} />
+        {/* FOOTER */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>© 2024 CafeResto. Tous droits réservés.</Text>
+          <View style={styles.socialIcons}>
+            <Ionicons name="logo-facebook" size={24} color="#8B6F47" style={styles.socialIcon} />
+            <Ionicons name="logo-instagram" size={24} color="#8B6F47" style={styles.socialIcon} />
+            <Ionicons name="logo-twitter" size={24} color="#8B6F47" style={styles.socialIcon} />
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -1738,8 +1760,8 @@ heartButton: {
     paddingRight: 8,
   },
   nearbyCard: {
-    width: width * 0.6,
-    height: 200,
+    width: width * 0.75,
+    height: 250,
     borderRadius: 18,
     marginRight: 12,
     overflow: 'hidden',
@@ -2187,6 +2209,25 @@ heartButton: {
     color: '#FFF',
     fontSize: 13,
     fontWeight: '600',
+  },
+  footerContainer: {
+    backgroundColor: '#F0E1D2',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#6B4F33',
+    marginBottom: 15,
+  },
+  socialIcons: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  socialIcon: {
+    // Styles spécifiques aux icônes sociales si nécessaire
   },
 });
 export default HomeScreen;
