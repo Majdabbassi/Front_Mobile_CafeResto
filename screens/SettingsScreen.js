@@ -1,10 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-export default function SettingsScreen({ navigation }) {
+export default function SettingsScreen() {
+  const navigation = useNavigation();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = React.useState(false);
+
+  const handleLogout = () => {
+    // Ici, vous pouvez ajouter la logique de déconnexion, par exemple, effacer le token d'authentification
+    // AsyncStorage.clear(); ou authService.logout();
+    navigation.navigate('Menu'); // Redirige vers la page 'Menu'
+  };
 
   return (
     <View style={styles.container}>
@@ -59,7 +67,7 @@ export default function SettingsScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
     </View>

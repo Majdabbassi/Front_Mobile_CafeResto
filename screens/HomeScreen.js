@@ -82,10 +82,12 @@ const HomeScreen = ({ navigation }) => {
     { id: 3, name: "Sandwich Poulet", description: "Sandwich frais au poulet grillé", price: "6.50€", imageUrl: 'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=800' },
   ];
   const dailyOffers = [
-    { id: 1, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1464306076886-da185f6a9d12?w=1600&auto=format&fit=crop&q=80' },
+       { id: 1, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&auto=format&fit=crop&q=80' },
+
     { id: 2, name: "Espresso House", offer: "1 Espresso acheté = 1 offert", visits: 94, distance: "1.2 km", imageUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=1600&auto=format&fit=crop&q=80' },
     { id: 3, name: "Café Milano", offer: "-30% sur les boissons glacées", visits: 72, distance: "2.1 km", imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1600&auto=format&fit=crop&q=80' },
-    { id: 4, name: "Coffee Corner", offer: "Pâtisserie offerte", visits: 156, distance: "0.8 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&auto=format&fit=crop&q=80' },
+        { id: 4, name: "Café Royal", offer: "-20% sur le Cappuccino", visits: 128, distance: "0.5 km", imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&auto=format&fit=crop&q=80' },
+
   ];
 
   const renderHeroSlide = ({ item }) => (
@@ -135,6 +137,12 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.nearbyContent}>
           <Text style={styles.nearbyCafeName}>{item.name}</Text>
           <Text style={styles.nearbyVibe}>{item.vibe}</Text>
+          {item.coworking && (
+            <TouchableOpacity style={styles.coworkingButton} onPress={() => navigation.navigate("CoworkingDetails", { cafe: item })}>
+              <Ionicons name="briefcase-outline" size={16} color="#FFF" />
+              <Text style={styles.coworkingButtonText}>Coworking</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.nearbyButton}>
             <Text style={styles.nearbyButtonText}>Y aller</Text>
             <Ionicons name="arrow-forward" size={16} color="#3A2A23" />
@@ -197,9 +205,9 @@ const topRestaurants = [
   ];
 
   const nearbyCafes = [
-    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5, vibe: "Ambiance rétro chaleureuse", imageUrl: 'https://images.unsplash.com/photo-1493585552824-131927c85da2?w=900' },
-    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8, vibe: "Terrasse lumineuse", imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900' },
-    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2, vibe: "Idéal pour travailler", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900' },
+    { id: 1, name: "Café du Coin", distance: "0.3 km", rating: 4.5, vibe: "Ambiance rétro chaleureuse", imageUrl: 'https://images.unsplash.com/photo-1493585552824-131927c85da2?w=900', coworking: { powerOutlets: 'Nombreux', wifiQuality: 'Excellent', quietZone: true, availableSeats: '5-10' } },
+    { id: 2, name: "Le Petit Bistro", distance: "0.7 km", rating: 4.8, vibe: "Terrasse lumineuse", imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900', coworking: { powerOutlets: 'Limités', wifiQuality: 'Bon', quietZone: false, availableSeats: '2-4' } },
+    { id: 3, name: "Espresso Bar", distance: "1.1 km", rating: 4.2, vibe: "Idéal pour travailler", imageUrl: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900', coworking: { powerOutlets: 'Quelques-uns', wifiQuality: 'Moyen', quietZone: true, availableSeats: '1-2' } },
   ];
 
   // Animation d'entrée des cartes
@@ -727,7 +735,13 @@ const topRestaurants = [
           contentContainerStyle={styles.sidebarMenuContent}
           showsVerticalScrollIndicator={false}
         >
-          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('Profile', { user }); }}>
+          <View style={styles.sidebarImageContainer}>
+            <Image
+              source={{ uri: 'https://scontent.ftun8-1.fna.fbcdn.net/v/t39.30808-6/494515795_2835687209954279_9000285933114725111_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=9cWJQ5lsxMYQ7kNvwEGnUXM&_nc_oc=AdnYnOB1k9HTamrAEuhxrevj3J6RAZqDDlJ2G4sAFNpYpslN-d0Ge9nS2LjuKhsADvg&_nc_zt=23&_nc_ht=scontent.ftun8-1.fna&_nc_gid=GucrSPJ7QYZQZy-_Wr2cJg&oh=00_AfjUkIwvg3vzcQd_wdUpbqufBXO2V494w1BXcOvcYenSVQ&oe=692CA608' }}
+              style={styles.sidebarImage}
+            />
+          </View>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('ProfileScreen'); toggleSidebar(); }}>
             <Ionicons name="person-outline" size={24} color="#3A2A23" />
             <Text style={styles.menuText}>Mon Profil</Text>
           </TouchableOpacity>
@@ -745,6 +759,16 @@ const topRestaurants = [
                 <Text style={styles.favoritesCountText}>{favorites.length}</Text>
               </View>
             )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('BestCafes'); }}>
+            <Ionicons name="star-outline" size={24} color="#3A2A23" />
+            <Text style={styles.menuText}>Meilleurs Cafés</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => { toggleSidebar(); navigation.navigate('CaffeDating'); }}>
+            <Ionicons name="heart-circle-outline" size={24} color="#3A2A23" />
+            <Text style={styles.menuText}>Coffee Dating</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -2113,6 +2137,36 @@ heartButton: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#3A2A23',
+  },
+  sidebarImageContainer: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    overflow: 'hidden',
+    borderRadius: 75,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sidebarImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  coworkingButton: {
+    backgroundColor: '#6F4E37',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    alignSelf: 'flex-start',
+  },
+  coworkingButtonText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
 export default HomeScreen;

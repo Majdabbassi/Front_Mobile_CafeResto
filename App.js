@@ -20,6 +20,10 @@ import HistoryScreen from './screens/HistoryScreen';
 import OfferDetailsScreen from './screens/OfferDetailsScreen';
 import CafeListScreen from './screens/CafeListScreen';
 import ServeurScreen from './screens/ServeurScreen';
+import BestCafesScreen from './screens/BestCafesScreen';
+import CoworkingDetailsScreen from './screens/CoworkingDetailsScreen';
+import CaffeDatingScreen from './screens/CaffeDatingScreen';
+import ChatScreen from './screens/ChatScreen';
 
 // Écran d'accueil (Splash-like)
 function InitialWelcomeScreen({ navigation }) {
@@ -98,6 +102,9 @@ export default function App() {
         <Stack.Screen name="OfferDetails" component={OfferDetailsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CafeList" component={CafeListScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Serveur" component={ServeurScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="BestCafes" component={BestCafesScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CoworkingDetails" component={CoworkingDetailsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CaffeDating" component={CaffeDatingScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
